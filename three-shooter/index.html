@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Three Shooter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" media="screen" href="styles.css" />
+  <script src="bundle.js"></script>
+</head>
+
+<body>
+  <div id="blocker">
+    <div id="instructions">
+      <div style="font-size:40px; color: red;">WARNING</div>
+      <div>This video game contains fast flashing images</div>
+      <br />
+      <div style="font-size:25px">Click to play</div>
+      <div>(W, A, S, D = Move, MOUSE = Look around, Right click - on/off lighter, Esc - Show cursor)</div>
+      <br />
+      <div id="settings">
+        <div>Game settings:</div>
+        <span>Mouse sensitivity:</span>
+        <input id="mouse-sensitivity" type="range" min="1" max="400" value="200" step="1" >
+        <span id="mouse-sensitivity-value"></span>
+        <br />
+        <span>Audio volume:</span>
+        <input id="audio-volume" type="range" min="0" max="10" value="10" step="1" >
+        <span id="audio-volume-value"></span>
+        <br />
+        <span>FOV:</span>
+        <input id="fov" type="range" min="50" max="110" value="95" step="1" >
+        <span id="fov-value"></span>
+        <br />
+        <span>Render scale:</span>
+        <select id="pixelRatio-value">
+          <option value="0.18">1981</option>
+          <option value="0.5">Half</option>
+          <option value="1" selected>Normal</option>
+          <option value="2">Next Gen</option>
+          <option value="2.5">Next Gen Pro</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div id="render-container" />
+
+  <script type="text/javascript">
+    var blocker = document.getElementById('blocker');
+    var instructions = document.getElementById('instructions');
+    var renderContainer = document.getElementById('render-container');
+    var settings = document.getElementById('settings');
+    var mouseSensitivity = document.getElementById('mouse-sensitivity');
+    var mouseSensitivityValue = document.getElementById('mouse-sensitivity-value');
+    var audioVolume = document.getElementById('audio-volume');
+    var audioVolumeValue = document.getElementById('audio-volume-value');
+    var fov = document.getElementById('fov');
+    var fovValue = document.getElementById('fov-value');
+    var pixelRatioValue = document.getElementById('pixelRatio-value');
+
+    function updateMouseSensitivityValue(value) {
+      var valueFormated = (value * 100).toFixed(3);
+      var valueNode = document.createTextNode(valueFormated);
+      mouseSensitivityValue.innerHTML = '';
+      mouseSensitivityValue.appendChild(valueNode);
+    }
+
+    function updateAudioVolumeValue(value) {
+      var valueNode = document.createTextNode(value.toFixed(1));
+      audioVolumeValue.innerHTML = '';
+      audioVolumeValue.appendChild(valueNode);
+    }
+
+    function updateFovValue(value) {
+      var valueNode = document.createTextNode(value);
+      fovValue.innerHTML = '';
+      fovValue.appendChild(valueNode);
+    }
+
+    function onLoad() {
+      console.log('game loaded');
+    }
+
+    function getRendererSize() {
+      return {
+        width: ~~Math.min(renderContainer.offsetHeight * (4/3), renderContainer.offsetWidth),
+        height: ~~renderContainer.offsetHeight
+      };
+    }
+
+    var rendererSize = getRendererSize();
+
+    var threeShooter = new ThreeShooter.default({
+      renderContainer: renderContainer,
+      renderWidth: rendererSize.width,
+      renderHeight: rendererSize.height,
+      onLoad: onLoad
+    });
+
+    var keyBindings = {
+      49: 'weapon1',
+      50: 'weapon2',
+      87: 'walkForward',
+      83: 'walkBackward',
+      65: 'walkLeft',
+      68: 'walkRight',
+    };
+
+    var mouseBindings = {
+      0: 'firePrimary',
+      2: 'fireSecondary'
+    };
+
+    var actionPhases = {
+      start: 'start',
+      end: 'end'
+    };
+
+    function handlePlayerAction(bindings, code, actionPhase) {
+      var binding = bindings[code];
+      if (!binding) {
+        return;
+      }
+      switch (actionPhase) {
+        case 'start':
+          threeShooter.onPlayerActionStart(binding);
+          break;
+        case 'end':
+          threeShooter.onPlayerActionEnd(binding);
+          break;
+      }
+    }
+
+    function handlePlayerKeyboardAction(keyCode, actionPhase) {
+      handlePlayerAction(keyBindings, keyCode, actionPhase);
+    }
+
+    document.addEventListener('keydown', function(event) {
+      handlePlayerKeyboardAction(event.keyCode, actionPhases.start);
+    });
+
+    document.addEventListener('keyup', function(event) {
+      handlePlayerKeyboardAction(event.keyCode, actionPhases.end);
+    });
+
+    function handlePlayerMouseAction(keyCode, actionPhase) {
+      handlePlayerAction(mouseBindings, keyCode, actionPhase);
+    }
+
+    document.addEventListener('mousedown', function(event) {
+      handlePlayerMouseAction(event.button, actionPhases.start);
+    });
+
+    document.addEventListener('mouseup', function(event) {
+      handlePlayerMouseAction(event.button, actionPhases.end);
+    });
+
+    document.addEventListener('mousemove', function(event) {
+      var movementX = event.movementX;
+      threeShooter.onPlayerCameraMove(movementX);
+    });
+
+    document.addEventListener('wheel', function(event) {
+      var isWheelDown = event.deltaY > 0;
+      var isWheelUp = event.deltaY < 0;
+      if (isWheelDown) {
+        threeShooter.onPlayerActionStart('prevWeapon');
+      }
+      if (isWheelUp) {
+        threeShooter.onPlayerActionStart('nextWeapon');
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      var newRendererSize = getRendererSize();
+      threeShooter.handleResize(
+        newRendererSize.width,
+        newRendererSize.height
+      );
+    });
+
+    instructions.addEventListener('click', function (event) {
+      instructions.style.display = 'none';
+      blocker.style.display = 'none';
+      renderContainer.requestPointerLock();
+    });
+
+    settings.addEventListener('click', function(event) {
+      event.stopPropagation();
+    });
+
+    mouseSensitivity.addEventListener('input', function(event) {
+      var value = +event.target.value;
+      updateMouseSensitivity(value);
+    });
+
+    function updateMouseSensitivity(value) {
+      var newSensitivity = (0.002 * value) / 200;
+      threeShooter.updateMouseSensitivity(newSensitivity);
+      updateMouseSensitivityValue(newSensitivity);
+      saveSettings();
+    }
+
+    audioVolume.addEventListener('input', function(event) {
+      const value = +event.target.value;
+      updateAudioVolume(value);
+    });
+
+    function updateAudioVolume(value) {
+      var newVolume = value / 10;
+      threeShooter.updateAudioVolume(newVolume);
+      updateAudioVolumeValue(newVolume);
+      saveSettings();
+    }
+
+    fov.addEventListener('input', function(event) {
+      const value = +event.target.value;
+      updateFov(value);
+    });
+
+    function updatePixelRatio(value) {
+      pixelRatioValue.value = value;
+      threeShooter.renderer.setPixelRatio(+value);
+      saveSettings();
+    }
+
+    pixelRatioValue.addEventListener('change', function(event) {
+      updatePixelRatio(event.target.value);
+    });
+
+    function updateFov(value) {
+      threeShooter.updateFov(value);
+      updateFovValue(value);
+      saveSettings();
+    }
+
+    var settingsKey = 'settings';
+
+    function saveSettings() {
+      if (!localStorage) {
+        return;
+      }
+      var settings = {
+        mouseSensitivity: +mouseSensitivity.value,
+        audioVolume: +audioVolume.value,
+        fov: +fov.value,
+        pixelRatio: +pixelRatioValue.value,
+      };
+      localStorage.setItem(settingsKey, JSON.stringify(settings));
+    }
+
+    function loadSetting() {
+      if (!localStorage) {
+        return;
+      }
+      try {
+        var settings = JSON.parse(localStorage.getItem(settingsKey));
+        mouseSensitivity.value = settings.mouseSensitivity;
+        updateMouseSensitivity(settings.mouseSensitivity);
+        audioVolume.value = settings.audioVolume;
+        updateAudioVolume(settings.audioVolume);
+        fov.value = settings.fov;
+        updateFov(settings.fov);
+        updatePixelRatio(settings.pixelRatio);
+      } catch {
+        console.error('Falied to load game settings');
+      }
+    }
+    loadSetting();
+
+    document.addEventListener('pointerlockchange', function (event) {
+      if (document.pointerLockElement != renderContainer) {
+        blocker.style.display = 'block';
+        instructions.style.display = '';
+      }
+    });
+  </script>
+
+  <script type="text/javascript">
+    function showFps(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);}
+  </script>
+</body>
+
+</html>
