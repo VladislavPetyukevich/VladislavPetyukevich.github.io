@@ -1,54 +1,4 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Three Shooter</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" type="text/css" media="screen" href="styles.css" />
-  <script src="bundle.js"></script>
-</head>
-
-<body>
-  <div id="blocker">
-    <div id="instructions">
-      <div style="font-size: 20px">This is pre alpha version</div>
-      <div style="font-size:40px; color: red;">WARNING</div>
-      <div>This video game contains fast flashing images</div>
-      <br />
-      <div style="font-size:25px">Click to play</div>
-      <div>(W, A, S, D = Move, MOUSE = Look around, Right click - on/off lighter, Esc - Show cursor)</div>
-      <br />
-      <div id="settings">
-        <div>Game settings:</div>
-        <span>Mouse sensitivity:</span>
-        <input id="mouse-sensitivity" type="range" min="1" max="400" value="200" step="1" >
-        <span id="mouse-sensitivity-value"></span>
-        <br />
-        <span>Audio volume:</span>
-        <input id="audio-volume" type="range" min="0" max="10" value="10" step="1" >
-        <span id="audio-volume-value"></span>
-        <br />
-        <span>FOV:</span>
-        <input id="fov" type="range" min="50" max="110" value="95" step="1" >
-        <span id="fov-value"></span>
-        <br />
-        <span>Render scale:</span>
-        <select id="pixelRatio-value">
-          <option value="0.18">1981</option>
-          <option value="0.5">Half</option>
-          <option value="1" selected>Normal</option>
-          <option value="2">Next Gen</option>
-          <option value="2.5">Next Gen Pro</option>
-        </select>
-      </div>
-    </div>
-  </div>
-  <div id="render-container" />
-
-  <script type="text/javascript">
-    var blocker = document.getElementById('blocker');
+<!doctype html><html><head><meta charset="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Three Shooter</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" media="screen" href="styles.css"/></head><body><div id="blocker"><div id="instructions"><div style="font-size: 20px">This is pre alpha version</div><div style="font-size:40px; color: red;">WARNING</div><div>This video game contains fast flashing images</div><br/><div style="font-size:25px">Click to play</div><div>(W, A, S, D = Move, MOUSE = Look around, Right click - on/off lighter, Esc - Show cursor)</div><br/><div id="settings"><div>Game settings:</div><span>Mouse sensitivity:</span> <input id="mouse-sensitivity" type="range" min="1" max="400" value="200" step="1"> <span id="mouse-sensitivity-value"></span><br/><span>Audio volume:</span> <input id="audio-volume" type="range" min="0" max="10" value="10" step="1"> <span id="audio-volume-value"></span><br/><span>FOV:</span> <input id="fov" type="range" min="50" max="110" value="95" step="1"> <span id="fov-value"></span><br/><span>Render scale:</span> <select id="pixelRatio-value"><option value="0.18">1981</option><option value="0.5">Half</option><option value="1" selected="selected">Normal</option><option value="2">Next Gen</option><option value="2.5">Next Gen Pro</option></select></div></div></div><div id="render-container"/><script src="main.12d74a360dee3e416232.js?7af820b18924b6dcd5b1"></script><script>var blocker = document.getElementById('blocker');
     var instructions = document.getElementById('instructions');
     var renderContainer = document.getElementById('render-container');
     var settings = document.getElementById('settings');
@@ -275,12 +225,4 @@
         blocker.style.display = 'block';
         instructions.style.display = '';
       }
-    });
-  </script>
-
-  <script type="text/javascript">
-    function showFps(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);}
-  </script>
-</body>
-
-</html>
+    });</script><script>function showFps(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);}</script></body></html>
